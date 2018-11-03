@@ -17,7 +17,7 @@ class SourceCodeFilesystemExtensionTest extends TestCase
      */
     public function testFilesystems(string $filesystem)
     {
-        $registry = $this->createRegistry($filesystem);
+        $registry = $this->createRegistry();
         $this->assertInstanceOf(Filesystem::class, $registry->get($filesystem));
     }
 
