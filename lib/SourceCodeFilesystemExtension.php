@@ -2,6 +2,8 @@
 
 namespace Phpactor\Extension\SourceCodeFilesystem;
 
+use Phpactor\Extension\ComposerAutoloader\ComposerAutoloaderExtension;
+use Phpactor\FilePathResolverExtension\FilePathResolverExtension;
 use Phpactor\Filesystem\Adapter\Composer\ComposerFileListProvider;
 use Phpactor\Filesystem\Adapter\Git\GitFilesystem;
 use Phpactor\Filesystem\Adapter\Simple\SimpleFilesystem;
@@ -59,17 +61,17 @@ class SourceCodeFilesystemExtension implements Extension
             );
         });
         $container->register(self::SERVICE_FILESYSTEM_GIT, function (Container $container) {
-            return new GitFilesystem(FilePath::fromString($container->getParameter('cwd')));
+            return new GitFilesystem(FilePath::fromString($this->projectRoot($container)));
         }, [ 'source_code_filesystem.filesystem' => [ 'name' => self::FILESYSTEM_GIT ]]);
         
         $container->register(self::SERVICE_FILESYSTEM_SIMPLE, function (Container $container) {
-            return new SimpleFilesystem(FilePath::fromString($container->getParameter('cwd')));
+            return new SimpleFilesystem(FilePath::fromString($this->projectRoot($container)));
         }, [ 'source_code_filesystem.filesystem' => ['name' => self::FILESYSTEM_SIMPLE]]);
         
         $container->register(self::SERVICE_FILESYSTEM_COMPOSER, function (Container $container) {
             $providers = [];
-            $cwd = FilePath::fromString($container->getParameter('cwd'));
-            $classLoaders = $container->get('composer.class_loaders');
+            $cwd = FilePath::fromString($this->projectRoot($container));
+            $classLoaders = $container->get(ComposerAutoloaderExtension::SERVICE_AUTOLOADERS);
         
             if (!$classLoaders) {
                 throw new NotSupported('No composer class loaders found/configured');
@@ -81,5 +83,10 @@ class SourceCodeFilesystemExtension implements Extension
         
             return new SimpleFilesystem($cwd, new ChainFileListProvider($providers));
         }, [ 'source_code_filesystem.filesystem' => [ 'name' => self::FILESYSTEM_COMPOSER ]]);
+    }
+
+    private function projectRoot(Container $container): string
+    {
+        return $container->get(FilePathResolverExtension::SERVICE_FILE_PATH_RESOLVER)->resolve('%project_root%');
     }
 }

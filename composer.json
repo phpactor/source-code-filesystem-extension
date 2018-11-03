@@ -12,7 +12,9 @@
 
     "require": {
         "phpactor/container": "^1.2",
-        "phpactor/source-code-filesystem": "dev-master"
+        "phpactor/source-code-filesystem": "dev-master",
+        "phpactor/file-path-resolver-extension": "dev-master",
+        "phpactor/composer-autoloader-extension": "dev-master"
     },
     "require-dev": {
         "phpstan/phpstan": "^0.10.5",
