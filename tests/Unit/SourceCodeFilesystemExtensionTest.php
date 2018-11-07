@@ -38,5 +38,4 @@ class SourceCodeFilesystemExtensionTest extends TestCase
 
         return $container->get(SourceCodeFilesystemExtension::SERVICE_REGISTRY);
     }
-
 }
