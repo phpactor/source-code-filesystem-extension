@@ -3,6 +3,7 @@
 namespace Phpactor\Extension\SourceCodeFilesystem;
 
 use Phpactor\Extension\ComposerAutoloader\ComposerAutoloaderExtension;
+use Phpactor\Extension\Logger\LoggingExtension;
 use Phpactor\FilePathResolverExtension\FilePathResolverExtension;
 use Phpactor\Filesystem\Adapter\Composer\ComposerFileListProvider;
 use Phpactor\Filesystem\Adapter\Git\GitFilesystem;
@@ -47,14 +48,14 @@ class SourceCodeFilesystemExtension implements Extension
                 try {
                     $filesystems[$attributes['name']] = $container->get($serviceId);
                 } catch (NotSupported $exception) {
-                    $container->get('monolog.logger')->warning(sprintf(
+                    $container->get(LoggingExtension::SERVICE_LOGGER)->warning(sprintf(
                         'Filesystem "%s" not supported: "%s"',
                         $attributes['name'],
                         $exception->getMessage()
                     ));
                 }
             }
-        
+
             return new FallbackFilesystemRegistry(
                 new MappedFilesystemRegistry($filesystems),
                 'simple'
@@ -63,24 +64,24 @@ class SourceCodeFilesystemExtension implements Extension
         $container->register(self::SERVICE_FILESYSTEM_GIT, function (Container $container) {
             return new GitFilesystem(FilePath::fromString($this->projectRoot($container)));
         }, [ 'source_code_filesystem.filesystem' => [ 'name' => self::FILESYSTEM_GIT ]]);
-        
+
         $container->register(self::SERVICE_FILESYSTEM_SIMPLE, function (Container $container) {
             return new SimpleFilesystem(FilePath::fromString($this->projectRoot($container)));
         }, [ 'source_code_filesystem.filesystem' => ['name' => self::FILESYSTEM_SIMPLE]]);
-        
+
         $container->register(self::SERVICE_FILESYSTEM_COMPOSER, function (Container $container) {
             $providers = [];
             $cwd = FilePath::fromString($this->projectRoot($container));
             $classLoaders = $container->get(ComposerAutoloaderExtension::SERVICE_AUTOLOADERS);
-        
+
             if (!$classLoaders) {
                 throw new NotSupported('No composer class loaders found/configured');
             }
-        
+
             foreach ($classLoaders as $classLoader) {
                 $providers[] = new ComposerFileListProvider($cwd, $classLoader);
             }
-        
+
             return new SimpleFilesystem($cwd, new ChainFileListProvider($providers));
         }, [ 'source_code_filesystem.filesystem' => [ 'name' => self::FILESYSTEM_COMPOSER ]]);
     }
