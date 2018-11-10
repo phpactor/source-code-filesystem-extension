@@ -5,9 +5,11 @@ namespace Phpactor\Extension\SourceCodeFilesystem\Tests\Unit;
 use PHPUnit\Framework\TestCase;
 use Phpactor\Container\PhpactorContainer;
 use Phpactor\Extension\ComposerAutoloader\ComposerAutoloaderExtension;
+use Phpactor\Extension\Logger\LoggingExtension;
 use Phpactor\Extension\SourceCodeFilesystem\SourceCodeFilesystemExtension;
 use Phpactor\FilePathResolverExtension\FilePathResolverExtension;
-use Phpactor\Filesystem\Domain\Filesystem;
+use Phpactor\Filesystem\Adapter\Git\GitFilesystem;
+use Phpactor\Filesystem\Adapter\Simple\SimpleFilesystem;
 use Phpactor\Filesystem\Domain\FilesystemRegistry;
 
 class SourceCodeFilesystemExtensionTest extends TestCase
@@ -15,26 +17,39 @@ class SourceCodeFilesystemExtensionTest extends TestCase
     /**
      * @dataProvider provideFilesystems
      */
-    public function testFilesystems(string $filesystem)
+    public function testFilesystems(string $filesystem, string $expectedClass)
     {
-        $registry = $this->createRegistry();
-        $this->assertInstanceOf(Filesystem::class, $registry->get($filesystem));
+        $registry = $this->createRegistry([
+            ComposerAutoloaderExtension::PARAM_AUTOLOADER_PATH => __DIR__ . '/../../vendor/autoload.php',
+        ]);
+        $this->assertInstanceOf($expectedClass, $registry->get($filesystem));
     }
 
     public function provideFilesystems()
     {
-        yield [ 'git' ];
-        yield [ 'simple' ];
-        yield [ 'composer' ];
+        yield [ 'git', GitFilesystem::class ];
+        yield [ 'simple', SimpleFilesystem::class ];
+        yield [ 'composer', SimpleFilesystem::class ];
     }
 
-    public function createRegistry(): FilesystemRegistry
+    public function testComposerNotSupported()
+    {
+        $registry = $this->createRegistry([
+            SourceCodeFilesystemExtension::PARAM_PROJECT_ROOT => __DIR__,
+            ComposerAutoloaderExtension::PARAM_AUTOLOADER_PATH => __DIR__ . '/no-autoload.php',
+        ]);
+        $composer = $registry->get('composer');
+        $this->assertInstanceOf(SimpleFilesystem::class, $composer);
+    }
+
+    public function createRegistry(array $config): FilesystemRegistry
     {
         $container = PhpactorContainer::fromExtensions([
             SourceCodeFilesystemExtension::class,
-            FilePathResolverExtension::class,
             ComposerAutoloaderExtension::class,
-        ]);
+            LoggingExtension::class,
+            FilePathResolverExtension::class,
+        ], $config);
 
         return $container->get(SourceCodeFilesystemExtension::SERVICE_REGISTRY);
     }
