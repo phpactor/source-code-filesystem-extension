@@ -3,6 +3,7 @@
 namespace Phpactor\Extension\SourceCodeFilesystem;
 
 use Phpactor\Extension\ComposerAutoloader\ComposerAutoloaderExtension;
+use Phpactor\Extension\Logger\LoggingExtension;
 use Phpactor\FilePathResolverExtension\FilePathResolverExtension;
 use Phpactor\Filesystem\Adapter\Composer\ComposerFileListProvider;
 use Phpactor\Filesystem\Adapter\Git\GitFilesystem;
@@ -51,7 +52,7 @@ class SourceCodeFilesystemExtension implements Extension
                 try {
                     $filesystems[$attributes['name']] = $container->get($serviceId);
                 } catch (NotSupported $exception) {
-                    $container->get('monolog.logger')->warning(sprintf(
+                    $container->get(LoggingExtension::SERVICE_LOGGER)->warning(sprintf(
                         'Filesystem "%s" not supported: "%s"',
                         $attributes['name'],
                         $exception->getMessage()
