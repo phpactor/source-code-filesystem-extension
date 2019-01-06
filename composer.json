@@ -3,6 +3,7 @@
     "description": "Source Code Filesystem Extension",
     "license": "MIT",
     "type": "phpactor-extension",
+    "minimum-stability": "dev",
     "authors": [
         {
             "name": "Daniel Leech",
