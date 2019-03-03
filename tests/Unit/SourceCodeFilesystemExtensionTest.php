@@ -27,7 +27,9 @@ class SourceCodeFilesystemExtensionTest extends TestCase
 
     public function provideFilesystems()
     {
-        yield [ 'git', GitFilesystem::class ];
+        // disable this as travis does not have git when tested via. the
+        // Phpactor test suite (this is there installed as a dependency).
+        // yield [ 'git', GitFilesystem::class ];
         yield [ 'simple', SimpleFilesystem::class ];
         yield [ 'composer', SimpleFilesystem::class ];
     }
