@@ -1,9 +1,8 @@
 {
     "name": "phpactor/source-code-filesystem-extension",
+    "type": "phpactor-extension",
     "description": "Source Code Filesystem Extension",
     "license": "MIT",
-    "type": "phpactor-extension",
-    "minimum-stability": "dev",
     "authors": [
         {
             "name": "Daniel Leech",
@@ -11,15 +10,22 @@
         }
     ],
     "require": {
+        "phpactor/composer-autoloader-extension": "~0.1",
         "phpactor/container": "^1.2",
-        "phpactor/source-code-filesystem": "~0.1",
         "phpactor/file-path-resolver-extension": "~0.1",
-        "phpactor/composer-autoloader-extension": "~0.1"
+        "phpactor/source-code-filesystem": "~0.1"
     },
     "require-dev": {
+        "ergebnis/composer-normalize": "^2.0",
+        "friendsofphp/php-cs-fixer": "^2.17",
         "phpstan/phpstan": "~0.12.0",
-        "phpunit/phpunit": "~7.0",
-        "friendsofphp/php-cs-fixer": "~2.15.0"
+        "phpunit/phpunit": "~7.0"
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "0.1.x-dev"
+        },
+        "phpactor.extension_class": "Phpactor\\Extension\\SourceCodeFilesystem\\SourceCodeFilesystemExtension"
     },
     "autoload": {
         "psr-4": {
@@ -31,10 +37,6 @@
             "Phpactor\\Extension\\SourceCodeFilesystem\\Tests\\": "tests/"
         }
     },
-    "extra": {
-        "phpactor.extension_class": "Phpactor\\Extension\\SourceCodeFilesystem\\SourceCodeFilesystemExtension",
-        "branch-alias": {
-            "dev-master": "0.1.x-dev"
-        }
-    }
+    "minimum-stability": "dev",
+    "prefer-stable": true
 }
