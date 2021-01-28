@@ -32,19 +32,19 @@ class SourceCodeFilesystemExtension implements Extension
     /**
      * {@inheritDoc}
      */
-    public function configure(Resolver $schema)
+    public function configure(Resolver $schema): void
     {
         $schema->setDefaults([
             self::PARAM_PROJECT_ROOT => '%project_root%',
         ]);
     }
 
-    public function load(ContainerBuilder $container)
+    public function load(ContainerBuilder $container): void
     {
         $this->registerFilesystems($container);
     }
 
-    private function registerFilesystems(ContainerBuilder $container)
+    private function registerFilesystems(ContainerBuilder $container): void
     {
         $container->register(self::SERVICE_REGISTRY, function (Container $container) {
             $filesystems = [];

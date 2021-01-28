@@ -17,7 +17,7 @@ class SourceCodeFilesystemExtensionTest extends TestCase
     /**
      * @dataProvider provideFilesystems
      */
-    public function testFilesystems(string $filesystem, string $expectedClass)
+    public function testFilesystems(string $filesystem, string $expectedClass): void
     {
         $registry = $this->createRegistry([
             ComposerAutoloaderExtension::PARAM_AUTOLOADER_PATH => __DIR__ . '/../../vendor/autoload.php',
@@ -34,7 +34,7 @@ class SourceCodeFilesystemExtensionTest extends TestCase
         yield [ 'composer', SimpleFilesystem::class ];
     }
 
-    public function testComposerNotSupported()
+    public function testComposerNotSupported(): void
     {
         $registry = $this->createRegistry([
             SourceCodeFilesystemExtension::PARAM_PROJECT_ROOT => __DIR__,
